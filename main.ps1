@@ -1,52 +1,49 @@
 # Import necessary assemblies for Windows Forms
 Add-Type -AssemblyName System.Windows.Forms
 
-# Function to list installed programs using winget (adapt as needed)
+# Function to list installed programs (modify as needed for your system)
 function Get-InstalledPrograms {
-    winget list | Select-Object -Skip 2 | ForEach-Object {
-        $item = $_ -split '\s{2,}', 5
-        [PSCustomObject]@{
-            Name = $item[0]
-            Id   = $item[1]
-        }
-    }
+    # Example: Query the registry or use a suitable method to list programs
+    Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* |
+        Select-Object DisplayName, DisplayVersion, Publisher, InstallDate |
+        Where-Object { $_.DisplayName -ne $null }
 }
 
-# Function to uninstall a program using winget (adapt as needed)
-function Uninstall-Program($programId) {
-    winget uninstall --id $programId --silent
+# Function to uninstall a program (modify as needed for your system)
+function Uninstall-Program($programName) {
+    # Example: Use a suitable method to uninstall programs, such as winget, msiexec, etc.
+    Start-Process "msiexec.exe" -arg "/x $programName /quiet" -Wait
 }
 
 # Create and display the UI
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "Bulk Uninstall Programs"
-$form.Size = New-Object System.Drawing.Size(800,600)
+$form.Text = 'Bulk Uninstall Programs'
+$form.Size = New-Object System.Drawing.Size(800, 600)
 
 $label = New-Object System.Windows.Forms.Label
-$label.Location = New-Object System.Drawing.Point(10,10)
-$label.Size = New-Object System.Drawing.Size(280,20)
-$label.Text = "Select a program to uninstall:"
+$label.Location = New-Object System.Drawing.Point(10, 10)
+$label.Size = New-Object System.Drawing.Size(280, 20)
+$label.Text = 'Select a program to uninstall:'
 $form.Controls.Add($label)
 
 $listBox = New-Object System.Windows.Forms.ListBox
-$listBox.Location = New-Object System.Drawing.Point(10,40)
-$listBox.Size = New-Object System.Drawing.Size(760,400)
+$listBox.Location = New-Object System.Drawing.Point(10, 40)
+$listBox.Size = New-Object System.Drawing.Size(760, 400)
 $form.Controls.Add($listBox)
 
 $uninstallButton = New-Object System.Windows.Forms.Button
-$uninstallButton.Location = New-Object System.Drawing.Point(10,450)
-$uninstallButton.Size = New-Object System.Drawing.Size(100,30)
-$uninstallButton.Text = "Uninstall"
+$uninstallButton.Location = New-Object System.Drawing.Point(10, 450)
+$uninstallButton.Size = New-Object System.Drawing.Size(100, 30)
+$uninstallButton.Text = 'Uninstall'
 $uninstallButton.Add_Click({
     $selectedItem = $listBox.SelectedItem
-    $programId = ($selectedItem -split '\s+', 2)[1]
-    Uninstall-Program -programId $programId
+    Uninstall-Program -programName $selectedItem
 })
 $form.Controls.Add($uninstallButton)
 
 # Populate the list box with installed programs
 Get-InstalledPrograms | ForEach-Object {
-    $listBox.Items.Add($_.Name + " " + $_.Id)
+    $listBox.Items.Add($_.DisplayName)
 }
 
 # Show the form
