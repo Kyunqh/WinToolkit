@@ -1,5 +1,6 @@
-# Load PresentationFramework assembly for WPF support
-Add-Type -AssemblyName PresentationFramework
+# Load necessary assemblies
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 # Function to list installed programs
 function Get-InstalledPrograms {
@@ -14,17 +15,16 @@ function Uninstall-Program($programId) {
 
 # Function to create the GUI
 function Show-UninstallGUI {
-    # Create the main window
-    $window = New-Object System.Windows.Window
-    $window.Title = "Bulk Uninstall Programs"
-    $window.Width = 600
-    $window.Height = 400
+    # Create the main form
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = 'Bulk Uninstall Programs'
+    $form.Size = New-Object System.Drawing.Size(800, 600)
+    $form.StartPosition = 'CenterScreen'
 
     # Create a ListBox to show installed programs
-    $listBox = New-Object System.Windows.Controls.ListBox
-    $listBox.Width = 580
-    $listBox.Height = 300
-    $window.Content = $listBox
+    $listBox = New-Object System.Windows.Forms.ListBox
+    $listBox.Location = New-Object System.Drawing.Point(10, 10)
+    $listBox.Size = New-Object System.Drawing.Size(760, 480)
 
     # Populate ListBox with installed programs
     Get-InstalledPrograms | ForEach-Object {
@@ -32,8 +32,10 @@ function Show-UninstallGUI {
     }
 
     # Create a button to uninstall selected programs
-    $uninstallButton = New-Object System.Windows.Controls.Button
-    $uninstallButton.Content = "Uninstall Selected"
+    $uninstallButton = New-Object System.Windows.Forms.Button
+    $uninstallButton.Location = New-Object System.Drawing.Point(650, 500)
+    $uninstallButton.Size = New-Object System.Drawing.Size(120, 30)
+    $uninstallButton.Text = 'Uninstall Selected'
     $uninstallButton.Add_Click({
         $selectedItems = $listBox.SelectedItems
         foreach ($item in $selectedItems) {
@@ -42,14 +44,12 @@ function Show-UninstallGUI {
         }
     })
 
-    # Add the button to the window
-    $stackPanel = New-Object System.Windows.Controls.StackPanel
-    $stackPanel.Children.Add($listBox)
-    $stackPanel.Children.Add($uninstallButton)
-    $window.Content = $stackPanel
+    # Add controls to the form
+    $form.Controls.Add($listBox)
+    $form.Controls.Add($uninstallButton)
 
-    # Show the window
-    $window.ShowDialog() | Out-Null
+    # Show the form
+    [System.Windows.Forms.Application]::Run($form)
 }
 
 # Show the GUI
