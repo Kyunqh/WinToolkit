@@ -15,24 +15,6 @@ function Show-UninstallGUI {
     $listBox.Location = New-Object System.Drawing.Point(10, 10)
     $listBox.Size = New-Object System.Drawing.Size(760, 480)
 
-    # Populate ListBox with installed programs
-    Get-InstalledPrograms | ForEach-Object {
-        $listBox.Items.Add($_.Name)
-    }
-
-    # Create a button to uninstall selected programs
-    $uninstallButton = New-Object System.Windows.Forms.Button
-    $uninstallButton.Location = New-Object System.Drawing.Point(650, 500)
-    $uninstallButton.Size = New-Object System.Drawing.Size(120, 30)
-    $uninstallButton.Text = 'Uninstall Selected'
-    $uninstallButton.Add_Click({
-        $selectedItems = $listBox.SelectedItems
-        foreach ($item in $selectedItems) {
-            $programId = (Get-InstalledPrograms | Where-Object { $_.Name -eq $item }).IdentifyingNumber
-            Uninstall-Program -programId $programId
-        }
-    })
-
     # Add controls to the form
     $form.Controls.Add($listBox)
     $form.Controls.Add($uninstallButton)
