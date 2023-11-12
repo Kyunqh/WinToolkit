@@ -2,17 +2,6 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-# Function to list installed programs
-function Get-InstalledPrograms {
-    Get-WmiObject -Class Win32_Product | Select-Object Name, IdentifyingNumber
-}
-
-# Function to uninstall a program
-function Uninstall-Program($programId) {
-    $product = Get-WmiObject -Class Win32_Product | Where-Object { $_.IdentifyingNumber -eq $programId }
-    $product.Uninstall()
-}
-
 # Function to create the GUI
 function Show-UninstallGUI {
     # Create the main form
